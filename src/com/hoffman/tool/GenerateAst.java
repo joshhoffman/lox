@@ -14,26 +14,32 @@ public class GenerateAst {
             System.exit(64);
         }
         String outputDir = args[0];
-        defineAst(outputDir, "Expr", Arrays.asList(
-                "Assign : Token name, Expr value",
-                "Binary : Expr left, Token operator, Expr right",
-                "Grouping : Expr expression",
-                "Literal : Object value",
-                "Logical : Expr left, Token operator, Expr right",
-                "Unary : Token operator, Expr right",
-                "Variable : Token name"
-        ));
+        defineAst(
+                outputDir,
+                "Expr",
+                Arrays.asList(
+                        "Assign : Token name, Expr value",
+                        "Binary : Expr left, Token operator, Expr right",
+                        "Grouping : Expr expression",
+                        "Literal : Object value",
+                        "Logical : Expr left, Token operator, Expr right",
+                        "Unary : Token operator, Expr right",
+                        "Variable : Token name"));
 
-        defineAst(outputDir, "Stmt", Arrays.asList(
-                "Block : List<Stmt> statements",
-                "Expression : Expr expression",
-                "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
-                "Print : Expr expression",
-                "Var : Token name, Expr initializer"
-        ));
+        defineAst(
+                outputDir,
+                "Stmt",
+                Arrays.asList(
+                        "Block : List<Stmt> statements",
+                        "Expression : Expr expression",
+                        "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
+                        "Print : Expr expression",
+                        "Var : Token name, Expr initializer",
+                        "While : Expr condition, Stmt body"));
     }
 
-    private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
+    private static void defineAst(String outputDir, String baseName, List<String> types)
+            throws IOException {
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, StandardCharsets.UTF_8);
 
@@ -59,7 +65,8 @@ public class GenerateAst {
         writer.close();
     }
 
-    private static void defineType(PrintWriter writer, String baseName, String className, String fieldList) {
+    private static void defineType(
+            PrintWriter writer, String baseName, String className, String fieldList) {
         writer.println("    static class " + className + " extends " + baseName + " {");
 
         // Constructor
@@ -91,10 +98,17 @@ public class GenerateAst {
     private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
         writer.println("    interface Visitor<R> {");
 
-        for(String type : types) {
+        for (String type : types) {
             String typeName = type.split(":")[0].trim();
-            writer.println("        R visit" + typeName + baseName
-                    + "(" + typeName + " " + baseName.toLowerCase() + ");");
+            writer.println(
+                    "        R visit"
+                            + typeName
+                            + baseName
+                            + "("
+                            + typeName
+                            + " "
+                            + baseName.toLowerCase()
+                            + ");");
         }
 
         writer.println("    }");

@@ -18,22 +18,22 @@ public class Scanner {
 
     static {
         keywords = new HashMap<>();
-        keywords.put("and",     AND);
-        keywords.put("class",   CLASS);
-        keywords.put("else",    ELSE);
-        keywords.put("false",   FALSE);
-        keywords.put("for",     FOR);
-        keywords.put("fun",     FUN);
-        keywords.put("if",      IF);
-        keywords.put("nil",     NIL);
-        keywords.put("or",      OR);
-        keywords.put("print",   PRINT);
-        keywords.put("return",  RETURN);
-        keywords.put("super",   SUPER);
-        keywords.put("this",    THIS);
-        keywords.put("true",    TRUE);
-        keywords.put("var",     VAR);
-        keywords.put("while",   WHILE);
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
     }
 
     Scanner(String source) {
@@ -41,7 +41,7 @@ public class Scanner {
     }
 
     List<Token> scanTokens() {
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
             start = current;
             scanToken();
         }
@@ -56,17 +56,37 @@ public class Scanner {
 
     private void scanToken() {
         char c = advance();
-        switch(c) {
-            case '(': addToken(LEFT_PAREN); break;
-            case ')': addToken(RIGHT_PAREN); break;
-            case '{': addToken(LEFT_BRACE); break;
-            case '}': addToken(RIGHT_BRACE); break;
-            case ',': addToken(COMMA); break;
-            case '.': addToken(DOT); break;
-            case '-': addToken(MINUS); break;
-            case '+': addToken(PLUS); break;
-            case ';': addToken(SEMICOLON); break;
-            case '*': addToken(STAR); break;
+        switch (c) {
+            case '(':
+                addToken(LEFT_PAREN);
+                break;
+            case ')':
+                addToken(RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(LEFT_BRACE);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(COMMA);
+                break;
+            case '.':
+                addToken(DOT);
+                break;
+            case '-':
+                addToken(MINUS);
+                break;
+            case '+':
+                addToken(PLUS);
+                break;
+            case ';':
+                addToken(SEMICOLON);
+                break;
+            case '*':
+                addToken(STAR);
+                break;
 
             case '!':
                 addToken(match('=') ? BANG_EQUAL : BANG);
@@ -107,7 +127,7 @@ public class Scanner {
             default:
                 if (isDigit(c)) {
                     number();
-                } else if(isAlpha(c)) {
+                } else if (isAlpha(c)) {
                     identifier();
                 } else {
                     Lox.error(line, "Unexpected character.");
@@ -160,19 +180,19 @@ public class Scanner {
     }
 
     private void number() {
-        while(isDigit(peek())) advance();
+        while (isDigit(peek())) advance();
 
         if (peek() == '.' && isDigit(peekNext())) {
             advance();
 
-            while(isDigit(peek())) advance();
+            while (isDigit(peek())) advance();
         }
 
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 
     private void identifier() {
-        while(isAlphaNumeric(peek())) advance();
+        while (isAlphaNumeric(peek())) advance();
 
         String text = source.substring(start, current);
         TokenType type = keywords.get(text);
@@ -190,9 +210,7 @@ public class Scanner {
     }
 
     private boolean isAlpha(char c) {
-        return (c >= 'a' && c <= 'z') ||
-                (c >= 'A' && c <= 'Z') ||
-                c == '_';
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
     }
 
     private boolean isAlphaNumeric(char c) {
