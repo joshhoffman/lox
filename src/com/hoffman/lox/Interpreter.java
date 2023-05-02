@@ -8,22 +8,24 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     Environment globals = environment;
 
     Interpreter() {
-        globals.define("clock", new LoxCallable() {
-            @Override
-            public int arity() {
-                return 0;
-            }
+        globals.define(
+                "clock",
+                new LoxCallable() {
+                    @Override
+                    public int arity() {
+                        return 0;
+                    }
 
-            @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
-                return (double)System.currentTimeMillis() / 1000.0;
-            }
+                    @Override
+                    public Object call(Interpreter interpreter, List<Object> arguments) {
+                        return (double) System.currentTimeMillis() / 1000.0;
+                    }
 
-            @Override
-            public String toString() {
-                return "<native fn>";
-            }
-        });
+                    @Override
+                    public String toString() {
+                        return "<native fn>";
+                    }
+                });
     }
 
     void interperet(List<Stmt> statements) {
@@ -105,8 +107,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if (arguments.size() != function.arity()) {
-            throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got "
-                    + arguments.size() + ".");
+            throw new RuntimeError(
+                    expr.paren,
+                    "Expected "
+                            + function.arity()
+                            + " arguments but got "
+                            + arguments.size()
+                            + ".");
         }
 
         return function.call(this, arguments);
@@ -224,7 +231,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        LoxFunction function = new LoxFunction(stmt);
+        LoxFunction function = new LoxFunction(stmt, environment);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -244,6 +251,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt) {
+        Object value = null;
+        if (stmt.value != null) value = evaluate(stmt.value);
+        throw new Return(value);
     }
 
     @Override

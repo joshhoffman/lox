@@ -49,7 +49,7 @@ public class Parser {
                 }
 
                 parameters.add(consume(IDENTIFIER, "Expect parameter name."));
-            } while(match(COMMA));
+            } while (match(COMMA));
         }
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
 
@@ -74,10 +74,22 @@ public class Parser {
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if (match(RETURN)) return returnStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after return value");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt forStatement() {
@@ -106,10 +118,7 @@ public class Parser {
         Stmt body = statement();
 
         if (increment != null) {
-            body = new Stmt.Block(
-                    Arrays.asList(
-                            body,
-                            new Stmt.Expression(increment)));
+            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
         }
 
         if (condition == null) condition = new Expr.Literal(true);
@@ -276,7 +285,7 @@ public class Parser {
     private Expr call() {
         Expr expr = primary();
 
-        while(true) {
+        while (true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
             } else {
@@ -295,7 +304,7 @@ public class Parser {
                     error(peek(), "Can't have more than 255 arguments.");
                 }
                 arguments.add(expression());
-            } while(match(COMMA));
+            } while (match(COMMA));
         }
 
         Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
