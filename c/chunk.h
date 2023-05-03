@@ -3,4 +3,12 @@
 
 #include "common.h"
 
+typedef enum {
+    OP_RETURN
+} OpCode;
+
+typdef struct {
+    uint8_t* code;
+} Chunk;
+
 #endif
