@@ -8,10 +8,27 @@ print fib(i);
 }
 
 class Bacon {
+init() {
+this.crispy = "yes";
+}
 eat() {
 print "Chomp chomp chomp " + this.crispy;
 }
 }
 var bacon = Bacon();
-bacon.crispy = "yes";
 bacon.eat();
+
+class Doughnut {
+    cook() {
+        print "Fry until golden brown";
+    }
+}
+
+class BostonCream < Doughnut {
+    cook() {
+        super.cook();
+        print "Pipe full of custard and coat with chocolate";
+    }
+}
+
+BostonCream().cook();
