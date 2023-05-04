@@ -113,7 +113,7 @@ static Token number() {
         // Consume the "."
         advance();
 
-        while (isDigit(peekNext())) advance();
+        while (isDigit(peek())) advance();
     }
 
     return makeToken(TOKEN_NUMBER);
