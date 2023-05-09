@@ -12,6 +12,7 @@ VM vm;
 
 static void resetStack() {
     vm.stackTop = vm.stack;
+    vm.frameCount = 0;
 }
 
 static void runtimeError(const char* format, ...) {
@@ -217,8 +218,7 @@ InterperetResult interperet(const char* source) {
     Chunk chunk;
     initChunk(&chunk);
 
-    if (!compile(source, &chunk)) {
-        freeChunk(&chunk);
+    if (!compile(source)) {
         return INTERPERET_COMPILE_ERROR;
     }
 
