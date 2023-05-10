@@ -23,10 +23,19 @@ static void runtimeError(const char* format, ...) {
 
     fputs("\n", stderr);
 
-    CallFrame* frame = &vm.frames[vm.frameCount - 1];
-    size_t instruction = frame->ip - frame->function->chunk.code - 1;
-    int line = frame->function->chunk.lines[instruction];
-    fprintf(stderr, "[line %d] in script\n", line);
+    for (int i = vm.frameCount - 1; i >= 0; i--) {
+        CallFrame* frame = &vm.frames[i];
+        ObjFunction* function = frame->function;
+        size_t instruction = frame->ip - function->chunk.code - 1;
+        fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+        if (function->name == NULL) {
+            fprintf(stderr, "script\n");
+        } else {
+            fprintf(stderr, "%s()\n", function->name->chars);
+        }
+    }
+
+    resetStack();
 }
 
 void initVM() {
@@ -57,6 +66,16 @@ static Value peek(int distance) {
 }
 
 static bool call(ObjFunction* function, int argCount) {
+    if (argCount != function->arity) {
+        runtimeError("Expected %d arguments but got %d", function->arity, argCount);
+        return false;
+    }
+
+    if (vm.frameCount == FRAMES_MAX) {
+        runtimeError("Stack overflow.");
+        return false;
+    }
+
     CallFrame* frame = &vm.frames[vm.frameCount++];
     frame->function = function;
     frame->ip = function->chunk.code;
@@ -232,8 +251,19 @@ InterperetResult run() {
                 frame = &vm.frames[vm.frameCount - 1];
                 break;
             }
-            case OP_RETURN:
-                return INTERPERET_OK;
+            case OP_RETURN: {
+                Value result = pop();
+                vm.frameCount--;
+                if (vm.frameCount == 0) {
+                    pop();
+                    return INTERPERET_OK;
+                }
+
+                vm.stackTop = frame->slots;
+                push(result);
+                frame = &vm.frames[vm.frameCount - 1];
+                break;
+            }
         }
     }
 
