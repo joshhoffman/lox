@@ -6,3 +6,6 @@ fun outer() {
     inner();
 }
 outer();
+
+class Test {}
+print Test();
