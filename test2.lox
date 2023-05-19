@@ -8,9 +8,12 @@ fun outer() {
 outer();
 
 class Test {
-    bacon() {}
+    bacon(first, second) {
+        print "scone with " + first + " and " + second;
+    }
     eggs() {}
 }
 var a = Test();
 a.test = "Hello";
 print a.test;
+a.bacon("cheese", "stuff");
