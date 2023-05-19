@@ -8,4 +8,6 @@ fun outer() {
 outer();
 
 class Test {}
-print Test();
+var a = Test();
+a.test = "Hello";
+print a.test;
