@@ -148,6 +148,25 @@ static bool callValue(Value callee, int argCount) {
     return false;
 }
 
+static bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount) {
+    Value method;
+    if (!tableGet(&klass->methods, name, &method)) {
+        runtimeError("Undefined property '%s'.", name->chars);
+        return false;
+    }
+    return call(AS_CLOSURE(method), argCount);
+}
+
+static bool invoke(ObjString* name, int argCount) {
+    Value receiver = peek(argCount);
+    if (!IS_INSTANCE(receiver)) {
+        runtimeError("Only instances have methods.");
+        return false;
+    }
+    ObjInstance* instance = AS_INSTANCE(receiver);
+    return invokeFromClass(instance->klass, name, argCount);
+}
+
 static bool bindMethod(ObjClass* klass, ObjString* name) {
     Value method;
     if (!tableGet(&klass->methods, name, &method)) {
@@ -308,7 +327,7 @@ InterperetResult run() {
                 break;
             }
             case OP_GET_PROPERTY: {
-                if (!IS_INSANCE(peek(0))) {
+                if (!IS_INSTANCE(peek(0))) {
                     runtimeError("Only instances have properties.");
                     return INTERPERET_RUNTIME_ERROR;
                 }
@@ -328,7 +347,7 @@ InterperetResult run() {
                 break;
             }
             case OP_SET_PROPERTY: {
-                if (!IS_INSANCE(peek(1))) {
+                if (!IS_INSTANCE(peek(1))) {
                     runtimeError("Only instances have fields.");
                     return INTERPERET_RUNTIME_ERROR;
                 }
@@ -396,6 +415,15 @@ InterperetResult run() {
             case OP_CALL: {
                 int argCount = READ_BYTE();
                 if (!callValue(peek(argCount), argCount)) {
+                    return INTERPERET_RUNTIME_ERROR;
+                }
+                frame = &vm.frames[vm.frameCount - 1];
+                break;
+            }
+            case OP_INVOKE: {
+                ObjString* method = READ_STRING();
+                int argCount = READ_BYTE();
+                if (!invoke(method, argCount)) {
                     return INTERPERET_RUNTIME_ERROR;
                 }
                 frame = &vm.frames[vm.frameCount - 1];
