@@ -49,7 +49,7 @@ void markObject(Obj* object) {
         if (vm.grayStack == NULL) exit(1);
     }
 
-    vm.grayStack[vm.grayCount]++;
+    vm.grayStack[vm.grayCount++] = object;
 }
 
 void markValue(Value value) {
