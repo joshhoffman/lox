@@ -20,3 +20,46 @@ var a = Test("cheese");
 a.test = "Hello";
 print a.test;
 a.bacon("stuff");
+
+fun fib(n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fib(n - 2) + fib(n - 1);
+}
+
+for (var i = 0; i < 10; i = i + 1) {
+    print fib(i);
+}
+
+var i = 0;
+while (i < 10) {
+    print fib(i);
+    i = i + 1;
+}
+
+class Bacon {
+init() {
+this.crispy = "yes";
+}
+eat() {
+print "Chomp chomp chomp " + this.crispy;
+}
+}
+var bacon = Bacon();
+bacon.eat();
+
+class Doughnut {
+    cook() {
+        print "Fry until golden brown";
+    }
+}
+
+class BostonCream < Doughnut {
+    cook() {
+        super.cook();
+        print "Pipe full of custard and coat with chocolate";
+    }
+}
+
+BostonCream().cook();
